@@ -1,0 +1,44 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+package product_service;
+
+service ProductService {
+    rpc CreateProduct (CreateRequest) returns (ProductCreationData);
+    rpc GetProduct (GetRequest) returns (GetProductData);
+}
+
+
+message CreateRequest {
+    string name = 1;
+    int64 price = 2;
+    string category = 3;
+    string brand = 4;
+}
+
+
+message ProductCreationData {
+    int64 product_id = 1;
+    google.protobuf.Timestamp created_at = 2;
+    google.protobuf.Timestamp updated_at = 3;
+    string name = 4;
+    int64 price = 5;
+    string category = 6;
+    string brand = 7;
+}
+
+
+message GetRequest {
+    int64 product_id = 1;
+}
+
+
+message GetProductData {
+    int64 product_id = 1;
+    string category = 2;
+    string name = 3;
+    string brand = 4;
+    int64 price = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
