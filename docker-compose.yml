@@ -23,6 +23,9 @@ services:
     volumes:
       - "./product_service:/product_service"
 
+    ports:
+      - "50051:50051"
+
     
 
 

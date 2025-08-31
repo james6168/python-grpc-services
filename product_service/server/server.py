@@ -81,7 +81,9 @@ async def serve():
 
     server = grpc.aio.server()
     product_service_pb2_grpc.add_ProductServiceServicer_to_server(ProductService(), server)
-    server.add_insecure_port(f"[::]:{settings.APP_PORT}")
+    bound = server.add_insecure_port(f"0.0.0.0:{settings.APP_PORT}")
+    if bound == 0:
+        raise RuntimeError(f"Failed to bind gRPC on port {settings.APP_PORT}")
     await server.start()
     print(f"[X] Async gRPC server started on port {settings.APP_PORT}")
 
