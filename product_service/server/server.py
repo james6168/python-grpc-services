@@ -3,10 +3,11 @@ from datetime import datetime, timezone
 from generated import product_service_pb2
 from generated import product_service_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
+from utils.database import is_postgres_healthy
 
 import asyncio
 import signal
-
+import settings
 
 # In Memory Database
 PRODUCTS = {}
@@ -66,11 +67,23 @@ class ProductService(product_service_pb2_grpc.ProductServiceServicer):
 
 
 async def serve():
+
+    if not await is_postgres_healthy(
+        host=settings.POSTGRES_HOST,
+        port=settings.POSTGRES_PORT,
+        user=settings.POSTGRES_USER,
+        password=settings.POSTGRES_PASSWORD,
+        database=settings.POSTGRES_DB
+    ):
+        raise RuntimeError(
+            "An error occurred during connection to PostgresDatabase"
+        )
+
     server = grpc.aio.server()
     product_service_pb2_grpc.add_ProductServiceServicer_to_server(ProductService(), server)
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port(f"[::]:{settings.APP_PORT}")
     await server.start()
-    print("[X] Async gRPC server started on port 50051")
+    print(f"[X] Async gRPC server started on port {settings.APP_PORT}")
 
     stop_event = asyncio.get_event_loop().create_future()
 
